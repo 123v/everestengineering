@@ -8,23 +8,23 @@ In the project directory, you can run:
 
 ### `requirements`
 
-Downlaod Nodejs Installer:\
+Downlaod Nodejs Installer:
 
-1. Visit the official [https://nodejs.org/en](https://nodejs.org/en)\
-2. Download the Windows installer (.msi) for the LTS (Long Term Support) version.\
+1. Visit the official [https://nodejs.org/en](https://nodejs.org/en)
+2. Download the Windows installer (.msi) for the LTS (Long Term Support) version.
 
-Install Node.js and npm:\
+Install Node.js and npm:
 
-1. Run the downloaded .msi installer.\
-2. Follow the prompts in the installer (accept the license agreement, select the destination folder, etc.).\
-3. The installer will install both Node.js and npm.\
+1. Run the downloaded .msi installer.
+2. Follow the prompts in the installer (accept the license agreement, select the destination folder, etc.).
+3. The installer will install both Node.js and npm.
 
-Verify Installation:\
+Verify Installation:
 
 - node -v
 - npm -v
 
-  These commands should display the installed versions of Node.js and npm, respectively.\
+  These commands should display the installed versions of Node.js and npm, respectively.
 
 ### `npm install`
 
