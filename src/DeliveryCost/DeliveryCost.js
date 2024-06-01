@@ -63,7 +63,6 @@ function DeliveryCost({ tab }) {
         const condition3 = (item.distance >= 50 && item.distance <= 250) && (item.weight >= 10 && item.weight <= 150)
         let discount = 0
         const includesOffer = offers.find(obj => obj.label === item.offer);
-        console.log("includesOffer", includesOffer, item);
         if ((condition1 || condition2 || condition3) && includesOffer) {
             discount = (Number(deliveryCost) * Number(includesOffer['value'])) / 100
         }
