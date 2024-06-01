@@ -3,7 +3,10 @@ import { Button, Col, Input, Row, Select, message } from 'antd';
 import { deliveryTimePackages, deliveryCostPackage } from "./mockData";
 
 const { Option } = Select;
+const COST = 'cost'
+const TIME = 'time'
 
+// Delivery Cost Component
 function DeliveryCost({ tab }) {
     const [baseDeliveryCost, setBaseDeliveryCost] = useState(100);
     const [noOfPackages, setNoOfPackages] = useState(0);
@@ -20,18 +23,17 @@ function DeliveryCost({ tab }) {
     const [maxWeight, setMaxWeight] = useState(200)
 
     useEffect(() => {
-        if (tab === 'cost') {
+        if (tab === COST) {
             setPackages(deliveryCostPackage)
             setNoOfPackages(3)
             setResult([])
         }
-        if (tab === 'time') {
+        if (tab === TIME) {
             setPackages(deliveryTimePackages)
             setNoOfPackages(5)
             setResult([])
         }
     }, [tab])
-
 
     const onPackageNumberChange = (e) => {
         const value = e.target.value === '' ? '' : parseInt(e.target.value, 10);
@@ -65,6 +67,7 @@ function DeliveryCost({ tab }) {
         return { id: item.id, total_cost: deliveryCost - discount, discount: Number(discount) }
     }
 
+    //Cost Calculating Function
     const onCostCalculation = () => {
         if (baseDeliveryCost) {
             if (noOfPackages) {
@@ -91,30 +94,32 @@ function DeliveryCost({ tab }) {
         }
     }
 
+    function calculateTime(pkg, vehicleTime) {
+        return Math.floor(((pkg.distance / maxSpeed) + vehicleTime) * 100) / 100;
+    }
+
+    // TIme Calculation Function
     function onTimeCalculation() {
+        //store all the vehicles into array, each vehicle will have packages loaded, and total time in delivering it
         let vehicles = [];
         for (let i = 0; i < noOfVehicles; i++) {
             vehicles.push({ id: i + 1, packages: [], booked: false, totalTime: 0 });
         }
 
         let timeList = [];
-
-        function calculateTime(pkg, vehicleTime) {
-            return Math.floor(((pkg.distance / maxSpeed) + vehicleTime) * 100) / 100;
-        }
-
         let remainingPackages = [];
 
         // First, handle pairing of packages within max weight
         for (let i = 0; i < packages.length; i++) {
             let maxWeightPackage = packages.reduce((max, pkg) => max.weight > pkg.weight ? max : pkg);
             for (let j = i + 1; j < packages.length; j++) {
-                let weightSum = packages[i].weight + packages[j].weight;
+                let weightSum = packages[i].weight + packages[j].weight; // sum of two package's weight
                 if (maxWeightPackage.weight < weightSum && weightSum <= maxWeight) {
                     for (let vehicle of vehicles) {
                         if (!vehicle.booked) {
                             timeList.push({ id: packages[i].id, time: calculateTime(packages[i], vehicle.totalTime) });
                             timeList.push({ id: packages[j].id, time: calculateTime(packages[j], vehicle.totalTime) });
+                            //update vehicles
                             let t1 = 2 * packages[i].distance / maxSpeed;
                             let t2 = 2 * packages[j].distance / maxSpeed;
                             vehicle.totalTime = Math.max(t1, t2);
@@ -123,24 +128,26 @@ function DeliveryCost({ tab }) {
                             break;
                         }
                     }
-                    remainingPackages.push(packages[i], packages[j]);
+                    remainingPackages.push(packages[i], packages[j]); //Add the delivered package into remaining packages
                     break;
                 }
             }
         }
 
-        // Filter out the remaining packages
+        // Filter out the remaining packages (all_packages - remaining_packages)
         let filteredPackages = packages.filter(pkg => !remainingPackages.includes(pkg));
         let sortedPackages = filteredPackages.sort((a, b) => b.weight - a.weight);
 
+        //get the min time vehicles among the all vehicles then assign the new package to it
         for (let pkg of sortedPackages) {
-            let availableVehicle = vehicles.reduce((min, v) => min.totalTime < v.totalTime ? min : v);
+            let availableVehicle = vehicles.reduce((min, v) => min.totalTime < v.totalTime ? min : v); //gives min time vehicle
             timeList.push({ id: pkg.id, time: calculateTime(pkg, availableVehicle.totalTime) });
             availableVehicle.totalTime += 2 * (pkg.distance / maxSpeed);
             availableVehicle.packages.push(pkg);
         }
 
-        const pkgs = onCostCalculation()
+        const pkgs = onCostCalculation() //get the other parametes like - package id, discount & total count
+        //get the final result
         const mergedArray = timeList.map(timeItem => {
             const costItem = pkgs.find(costItem => costItem.id === timeItem.id);
             return {
@@ -150,9 +157,8 @@ function DeliveryCost({ tab }) {
                 discount: costItem ? costItem.discount : null
             };
         });
-        console.log("mergedArray", mergedArray);
         setResult(mergedArray)
-        // return timeList;
+        return '';
     }
 
     return (
@@ -260,12 +266,13 @@ function DeliveryCost({ tab }) {
                 }
                 <Col span={24}>
                     {
-                        tab === 'cost' ?
+                        tab === COST ?
                             <Button type="primary" onClick={onCostCalculation}>Calculate Cost</Button>
                             :
                             <Button type="primary" onClick={onTimeCalculation}>Calculate Time</Button>
                     }
                 </Col>
+                {/**** Render Result starts**/}
                 {
                     result && result.length > 0 &&
                     <React.Fragment>
@@ -274,7 +281,7 @@ function DeliveryCost({ tab }) {
                                 <Col span={6}>Package Id</Col>
                                 <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>Total Cost</Col>
                                 <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>Discount</Col>
-                                {tab === 'time' && <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>Delivery Time in hours</Col>}
+                                {tab === TIME && <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>Delivery Time in hours</Col>}
                             </Row>
                         </Col>
                         {
@@ -285,7 +292,7 @@ function DeliveryCost({ tab }) {
                                             <Col span={6}>{item.id}</Col>
                                             <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>{item.total_cost}</Col>
                                             <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>{item.discount}</Col>
-                                            {tab === 'time' && <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>{item.time}</Col>}
+                                            {tab === TIME && <Col span={6} style={{ borderLeft: '1px solid #ccc' }}>{item.time}</Col>}
                                         </Row>
                                     </Col>
                                 )
