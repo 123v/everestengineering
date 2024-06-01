@@ -54,6 +54,7 @@ function DeliveryCost({ tab }) {
         setPackages(updatedPackages);
     };
 
+    // checking the offers and giving the discount on the basis of offer
     const calculateFinalCost = (item) => {
         let deliveryCost = Number(baseDeliveryCost) + Number(item.weight * 10) + Number(item.distance * 5)
         const condition1 = item.distance <= 200 && (item.weight >= 70 && item.weight <= 200)
