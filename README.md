@@ -61,4 +61,5 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ### `Note`
 
-I've used mock data which is already rendering the data in the input boxes.
+1. I've used mock data which is already rendering the data in the input boxes.
+2. I have attached the Python file that I developed first. It may not be useful right now, but I have attached it for reference.
